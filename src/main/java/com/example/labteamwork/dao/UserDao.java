@@ -61,6 +61,23 @@ public class UserDao {
         return user;
     }
 
+    public java.util.List<User> findAll() {
+        String sql = "SELECT * FROM users";
+        java.util.List<User> users = jdbcTemplate.query(sql, userRowMapper);
+        users.forEach(this::loadUserRoles);
+        return users;
+    }
+
+
+    public Optional<User> findByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        Optional<User> user = jdbcTemplate.query(sql, userRowMapper, email).stream().findFirst();
+
+        user.ifPresent(this::loadUserRoles);
+        return user;
+    }
+
+
     public Optional<User> findById(Long id) {
         String sql = "SELECT * FROM users WHERE id = ?";
         Optional<User> user = jdbcTemplate.query(sql, userRowMapper, id).stream().findFirst();
