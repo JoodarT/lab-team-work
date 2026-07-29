@@ -36,11 +36,10 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Пользователь с таким email уже существует");
         }
 
-        // Заполняем сущность с учетом вашей логики (Builder или Setter)
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // Здесь пока без шифрования
+        user.setPassword(request.getPassword());
         user.setEnabled(true);
 
         User savedUser = userDao.save(user);
