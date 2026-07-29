@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: online-quiz-platform
+
+  datasource:
+    url: jdbc:h2:file:./db/quizdb;AUTO_SERVER=TRUE;MODE=PostgreSQL
+    username: root
+    password: qwerty
+
+  liquibase:
+    change-log: classpath:database/changelog/master.yml
