@@ -1,4 +1,4 @@
-package config;
+package com.example.labteamwork.config;
 
 
 
@@ -17,7 +17,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("HeadHanter REST API")
+                        .title("Quiz Game REST API")
                         .version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList("basicAuth"))
                 .components(new Components()
