@@ -8,6 +8,7 @@ import com.example.labteamwork.entity.User;
 import com.example.labteamwork.service.UserService;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,8 +25,43 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        return userDao.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Пользователь с email " + email + " не найден"));
+    }
+
+    @Override
+    public UserResponseDto registerUser(UserRegisterRequest request) {
+        if (userDao.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Пользователь с таким email уже существует");
+        }
+
+        // Заполняем сущность с учетом вашей логики (Builder или Setter)
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword()); // Здесь пока без шифрования
+        user.setEnabled(true);
+
+        User savedUser = userDao.save(user);
+
+        userDao.addRoleToUser(savedUser.getId(), "ROLE_USER");
+
+        return mapToResponseDto(savedUser);
+    }
+
+    @Override
+    public UserResponseDto getUserById(Long id) {
+        User user = userDao.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь с id " + id + " не найден"));
+        return mapToResponseDto(user);
+    }
+
+    @Override
     public List<UserResponseDto> getAllUsers() {
-        return List.of();
+        return userDao.findAll().stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -33,20 +69,14 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    @Override
-    public UserResponseDto registerUser(UserRegisterRequest request) {
-        return null;
-    }
 
-    @Override
-    public UserResponseDto getUserById(Long id) {
-        return null;
-    }
 
-    @Override
-    public User getUserByEmail(String email) {
-        return userDao.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-    }
 
+    private UserResponseDto mapToResponseDto(User user) {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        return dto;
+    }
 }
