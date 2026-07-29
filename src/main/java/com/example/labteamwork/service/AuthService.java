@@ -1,13 +1,16 @@
 package com.example.labteamwork.service;
 
 import com.example.labteamwork.dao.UserDao;
+import com.example.labteamwork.dto.request.UserLoginRequest;
 import com.example.labteamwork.dto.request.UserRegisterRequest;
+import com.example.labteamwork.dto.response.UserResponseDto;
 import com.example.labteamwork.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -16,8 +19,8 @@ public class AuthService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    @Transactional
     public void registerUser(UserRegisterRequest request) {
         log.info("Попытка регистрации нового пользователя с username: {}", request.getUsername());
 
@@ -37,11 +40,32 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .enabled(true)
                 .build();
-
         User savedUser = userDao.save(user);
 
         userDao.addRoleToUser(savedUser.getId(), "ROLE_USER");
-
         log.info("Пользователь '{}' успешно зарегистрирован с ID {}", savedUser.getUsername(), savedUser.getId());
+    }
+
+    public UserResponseDto login(UserLoginRequest request) {
+        log.info("Попытка входа пользователя: {}", request.getUsername());
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
+
+        User user = userDao.findByUsername(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+
+        log.info("Пользователь '{}' успешно вошел в систему", user.getUsername());
+
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .build();
     }
 }
