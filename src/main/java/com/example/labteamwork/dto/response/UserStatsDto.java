@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class UserStatsDto {
     private Long userId;
     private String username;
-    private Integer totalQuizzesPassed;
-    private Double averageScore;
-    private Integer totalScore;
+    private String email;
+    private int totalQuizzesTaken;
+    private int totalQuizzesCreated;
+    private int totalScore;
+    private double averagePercentage;
 }

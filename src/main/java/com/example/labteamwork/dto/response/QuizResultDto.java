@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -20,4 +21,5 @@ public class QuizResultDto {
     private Integer score;
     private Double percentage;
     private LocalDateTime completedAt;
+    private List<QuestionDetailResultDto> questionsWithAnswers;
 }
