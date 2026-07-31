@@ -60,9 +60,14 @@ public class QuizDao {
         return quiz;
     }
 
-    public List<Quiz> findAll(int limit, int offset) {
-        String sql = "SELECT * FROM quizzes";
-        return jdbcTemplate.query(sql, quizRowMapper);
+    public List<Quiz> findAll(String category, int limit, int offset) {
+        if (category != null && !category.isBlank()) {
+            String sql = "SELECT * FROM quizzes WHERE LOWER(category) = LOWER(?) LIMIT ? OFFSET ?";
+            return jdbcTemplate.query(sql, quizRowMapper, category.trim(), limit, offset);
+        }
+
+        String sql = "SELECT * FROM quizzes LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, quizRowMapper, limit, offset);
     }
 
     public Optional<Quiz> findById(Long id) {

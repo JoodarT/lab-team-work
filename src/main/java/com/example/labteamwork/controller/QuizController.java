@@ -50,13 +50,14 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Получение списка всех квизов")
+    @Operation(summary = "Получение списка всех квизов (с фильтрацией и пагинацией)")
     @GetMapping
     public ResponseEntity<List<QuizSummaryResponseDto>> getAllQuizzes(
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("Запрос на получение списка всех квизов");
-        return ResponseEntity.ok(quizService.getAllQuizzes(page, size));
+        log.info("Запрос на получение списка квизов. Категория: {}, страница: {}, размер: {}", category, page, size);
+        return ResponseEntity.ok(quizService.getAllQuizzes(category, page, size));
     }
 
     @Operation(summary = "Получение детальной информации о квизе по ID")

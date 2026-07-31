@@ -14,7 +14,7 @@ public interface QuizService {
 
     QuizStartResponseDto startQuiz(Long quizId, Long userId);
 
-    List<QuizSummaryResponseDto> getAllQuizzes(int page, int size);
+    List<QuizSummaryResponseDto> getAllQuizzes(String category, int page, int size);
 
     QuizDetailResponseDto getQuizById(Long quizId);
 

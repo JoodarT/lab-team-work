@@ -68,7 +68,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizSummaryResponseDto> getAllQuizzes(int page, int size) {
+    public List<QuizSummaryResponseDto> getAllQuizzes(String category, int page, int size) {
         log.info("Запрос списка квизов. Страница: {}, размер: {}", page, size);
 
         if (page < 0) page = 0;
@@ -76,7 +76,7 @@ public class QuizServiceImpl implements QuizService {
 
         int offset = page * size;
 
-        List<Quiz> quizzes = quizDao.findAll(size, offset);
+        List<Quiz> quizzes = quizDao.findAll(category, size, offset);
 
         return quizzes.stream()
                 .map( quiz -> mapToQuizSummaryDto(
