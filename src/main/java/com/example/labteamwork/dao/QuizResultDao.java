@@ -36,7 +36,7 @@ public class QuizResultDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setLong(1, result.getUserId());
             ps.setLong(2, result.getQuizId());
             ps.setInt(3, result.getScore());
