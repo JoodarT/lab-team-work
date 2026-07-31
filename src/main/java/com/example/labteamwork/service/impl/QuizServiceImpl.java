@@ -11,7 +11,6 @@ import com.example.labteamwork.exception.ResourceNotFoundException;
 import com.example.labteamwork.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -46,18 +45,20 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuizStartResponseDto startQuiz(Long quizId, Long userId) {
-        log.info("Пользователь с id {} начинает викторину id {}", userId, quizId);
+    public QuizStartResponseDto startQuiz(Long quizId, String username) {
+        log.info("Пользователь с именем {} начинает викторину id {}", username, quizId);
 
         Quiz quiz = quizDao.findById(quizId)
                 .orElseThrow(() -> new ResourceNotFoundException("Викторина с id " + quizId + " не найдена"));
 
-        if (quizResultDao.existsByUserIdAndQuizId(userId, quizId)) {
+        User user = getUserByUsername(username);
+
+        if (quizResultDao.existsByUserIdAndQuizId(user.getId(), quizId)) {
             throw new IllegalArgumentException("Вы уже проходили эту викторину!");
         }
 
         LocalDateTime now = LocalDateTime.now();
-        quizSessionDao.saveOrUpdate(userId, quizId, now);
+        quizSessionDao.saveOrUpdate(user.getId(), quizId, now);
 
         return QuizStartResponseDto.builder()
                 .quizId(quizId)
