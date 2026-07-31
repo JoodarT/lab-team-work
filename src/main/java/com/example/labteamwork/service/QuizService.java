@@ -12,7 +12,9 @@ public interface QuizService {
 
     QuizDetailResponseDto createQuiz(QuizCreateRequest request, String username);
 
-    List<QuizSummaryResponseDto> getAllQuizzes();
+    QuizStartResponseDto startQuiz(Long quizId, Long userId);
+
+    List<QuizSummaryResponseDto> getAllQuizzes(int page, int size);
 
     QuizDetailResponseDto getQuizById(Long quizId);
 
