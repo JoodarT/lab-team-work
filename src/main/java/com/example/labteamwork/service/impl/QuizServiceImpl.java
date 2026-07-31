@@ -7,9 +7,11 @@ import com.example.labteamwork.dto.request.QuizRateRequest;
 import com.example.labteamwork.dto.request.QuizSolveRequest;
 import com.example.labteamwork.dto.response.*;
 import com.example.labteamwork.entity.*;
+import com.example.labteamwork.exception.ResourceNotFoundException;
 import com.example.labteamwork.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizResultDao quizResultDao;
     private final QuizRatingDao quizRatingDao;
     private final UserDao userDao;
+    private final QuizSessionDao quizSessionDao;
 
     @Override
     public QuizDetailResponseDto createQuiz(QuizCreateRequest request, String username) {
@@ -43,15 +46,44 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<QuizSummaryResponseDto> getAllQuizzes() {
-        log.info("Получение списка всех викторин");
+    public QuizStartResponseDto startQuiz(Long quizId, Long userId) {
+        log.info("Пользователь с id {} начинает викторину id {}", userId, quizId);
 
-        return quizDao.findAll().stream().map(quiz -> {
-            String creatorUsername = getCreatorUsernameById(quiz.getCreatorId());
-            int questionsCount = questionDao.countByQuizId(quiz.getId());
+        Quiz quiz = quizDao.findById(quizId)
+                .orElseThrow(() -> new ResourceNotFoundException("Викторина с id " + quizId + " не найдена"));
 
-            return mapToQuizSummaryDto(quiz, creatorUsername, questionsCount);
-        }).collect(Collectors.toList());
+        if (quizResultDao.existsByUserIdAndQuizId(userId, quizId)) {
+            throw new IllegalArgumentException("Вы уже проходили эту викторину!");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        quizSessionDao.saveOrUpdate(userId, quizId, now);
+
+        return QuizStartResponseDto.builder()
+                .quizId(quizId)
+                .startedAt(now)
+                .timeLimitSeconds(quiz.getTimeLimitSeconds())
+                .message("Викторина успешно начата. Отсчет времени пошел!")
+                .build();
+    }
+
+    @Override
+    public List<QuizSummaryResponseDto> getAllQuizzes(int page, int size) {
+        log.info("Запрос списка квизов. Страница: {}, размер: {}", page, size);
+
+        if (page < 0) page = 0;
+        if (size <= 0) size = 10;
+
+        int offset = page * size;
+
+        List<Quiz> quizzes = quizDao.findAll(size, offset);
+
+        return quizzes.stream()
+                .map( quiz -> mapToQuizSummaryDto(
+                        quiz,
+                        quizDao.getQuizCreatorUsername(quiz.getCreatorId()),
+                        questionDao.countByQuizId(quiz.getId())))
+                .toList();
     }
 
     @Override
@@ -76,6 +108,21 @@ public class QuizServiceImpl implements QuizService {
             throw new IllegalStateException("Вы уже проходили эту викторину. Повторное прохождение запрещено.");
         }
 
+        if (quiz.getTimeLimitSeconds() != null && quiz.getTimeLimitSeconds() > 0) {
+            QuizSession session = quizSessionDao.findByUserIdAndQuizId(user.getId(), quizId)
+                    .orElseThrow(() -> new IllegalArgumentException("Сначала необходимо начать викторину через /api/quizzes/" + quizId + "/start"));
+
+            long secondsElapsed = java.time.Duration.between(session.getStartedAt(), LocalDateTime.now()).getSeconds();
+
+            int allowedTime = quiz.getTimeLimitSeconds() + 5;
+
+            if (secondsElapsed > allowedTime) {
+                quizSessionDao.delete(user.getId(), quizId);
+                throw new IllegalArgumentException("Время на прохождение викторины истекло! Вы потратили "
+                        + secondsElapsed + " сек. из разрешенных " + quiz.getTimeLimitSeconds() + " сек.");
+            }
+        }
+
         Map<Long, Long> userAnswersMap = request.getAnswers().stream()
                 .collect(Collectors.toMap(QuestionAnswerRequest::getQuestionId, QuestionAnswerRequest::getSelectedOptionId));
 
@@ -91,7 +138,6 @@ public class QuizServiceImpl implements QuizService {
                 }
             }
         }
-
         QuizResult result = QuizResult.builder()
                 .userId(user.getId())
                 .quizId(quizId)
@@ -100,6 +146,7 @@ public class QuizServiceImpl implements QuizService {
                 .build();
 
         quizResultDao.save(result);
+        quizSessionDao.delete(user.getId(), quizId);
         log.info("Пользователь '{}' завершил викторину ID {} с результатом {}/{}", username, quizId, correctAnswersCount, questions.size());
 
         return buildQuizResultDto(quiz, result, questions.size());
