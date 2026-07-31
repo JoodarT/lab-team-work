@@ -42,11 +42,11 @@ public class QuizController {
     @PostMapping("/{quizId}/start")
     public ResponseEntity<QuizStartResponseDto> startQuiz(
             @PathVariable Long quizId,
-            @AuthenticationPrincipal User userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        log.info("Запрос на старт квиза {} от пользователя с ID: {}", quizId, userDetails.getId());
+        log.info("Запрос на старт квиза {} от пользователя с ID: {}", quizId, userDetails.getUsername());
 
-        QuizStartResponseDto response = quizService.startQuiz(quizId, userDetails.getId());
+        QuizStartResponseDto response = quizService.startQuiz(quizId, userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
 

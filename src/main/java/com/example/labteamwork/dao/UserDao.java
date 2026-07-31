@@ -41,7 +41,7 @@ public class UserDao {
             return ps;
         }, keyHolder);
 
-        user.setId(keyHolder.getKey().longValue());
+        user.setId(((Number) keyHolder.getKeys().get("id")).longValue());
         return user;
     }
 

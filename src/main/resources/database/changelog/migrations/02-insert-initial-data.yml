@@ -155,3 +155,14 @@ databaseChangeLog:
               - column: { name: question_id, valueNumeric: 3 }
               - column: { name: option_text, value: "@Component" }
               - column: { name: is_correct, valueBoolean: false }
+
+  - changeSet:
+            id: 14-reset-sequences
+            author: Bolot Azatov
+            changes:
+              - sql:
+                  sql: |
+                    ALTER TABLE users ALTER COLUMN id RESTART WITH 3;
+                    ALTER TABLE roles ALTER COLUMN id RESTART WITH 3;
+                    ALTER TABLE quizzes ALTER COLUMN id RESTART WITH 3;
+                    ALTER TABLE questions ALTER COLUMN id RESTART WITH 4;
