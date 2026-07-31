@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: database/changelog/migrations/01-init-schema.yml
+  - include:
+      file: database/changelog/migrations/02-insert-initial-data.yml
+  - include:
+      file: database/changelog/migrations/03-quiz-sessions-schema.yml
