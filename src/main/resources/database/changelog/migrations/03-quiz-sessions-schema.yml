@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 14-create-quiz-sessions-table
+      author: Bolot Azatov
+      changes:
+        - createTable:
+            tableName: quiz_sessions
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quiz_sessions_user
+                    references: users(id)
+                    deleteCascade: true
+              - column:
+                  name: quiz_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quiz_sessions_quiz
+                    references: quizzes(id)
+                    deleteCascade: true
+              - column:
+                  name: started_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: quiz_sessions
+            columnNames: user_id, quiz_id
+            constraintName: uq_user_quiz_session
