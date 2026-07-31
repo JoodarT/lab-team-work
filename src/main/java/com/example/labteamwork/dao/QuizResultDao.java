@@ -1,5 +1,6 @@
 package com.example.labteamwork.dao;
 
+import com.example.labteamwork.dto.response.GlobalLeaderboardEntryDto;
 import com.example.labteamwork.dto.response.LeaderboardEntryDto;
 import com.example.labteamwork.dto.response.UserStatsDto;
 import com.example.labteamwork.entity.QuizResult;
@@ -94,5 +95,20 @@ public class QuizResultDao {
                 .totalScore(rs.getInt("total_score"))
                 .averagePercentage(Math.round(rs.getDouble("average_percentage") * 100.0) / 100.0)
                 .build(), userId).stream().findFirst();
+    }
+
+    public List<GlobalLeaderboardEntryDto> getGlobalLeaderboard(int limit) {
+        String sql = "SELECT u.id as user_id, u.username, SUM(qr.score) as total_score " +
+                "FROM users u " +
+                "JOIN quiz_results qr ON u.id = qr.user_id " +
+                "GROUP BY u.id, u.username " +
+                "ORDER BY total_score DESC " +
+                "LIMIT ?";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> GlobalLeaderboardEntryDto.builder()
+                .userId(rs.getLong("user_id"))
+                .username(rs.getString("username"))
+                .totalScore(rs.getInt("total_score"))
+                .build(), limit);
     }
 }
