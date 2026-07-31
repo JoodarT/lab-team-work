@@ -32,6 +32,7 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "Пользователь успешно зарегистрирован"),
             @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных или пользователь уже существует")
     })
+
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody UserRegisterRequest request) {
         log.info("Получен запрос на регистрацию пользователя с username: {}", request.getUsername());
@@ -47,6 +48,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Успешный вход"),
             @ApiResponse(responseCode = "401", description = "Неверный логин или пароль")
     })
+
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> login(@Valid @RequestBody UserLoginRequest request) {
         log.info("Получен запрос на вход пользователя: {}", request.getUsername());
