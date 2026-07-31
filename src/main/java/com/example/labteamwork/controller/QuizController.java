@@ -3,10 +3,8 @@ package com.example.labteamwork.controller;
 import com.example.labteamwork.dto.request.QuizCreateRequest;
 import com.example.labteamwork.dto.request.QuizRateRequest;
 import com.example.labteamwork.dto.request.QuizSolveRequest;
-import com.example.labteamwork.dto.response.LeaderboardEntryDto;
-import com.example.labteamwork.dto.response.QuizDetailResponseDto;
-import com.example.labteamwork.dto.response.QuizResultDto;
-import com.example.labteamwork.dto.response.QuizSummaryResponseDto;
+import com.example.labteamwork.dto.response.*;
+import com.example.labteamwork.entity.User;
 import com.example.labteamwork.service.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,11 +38,25 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Начать прохождение квиза (запуск таймера)")
+    @PostMapping("/{quizId}/start")
+    public ResponseEntity<QuizStartResponseDto> startQuiz(
+            @PathVariable Long quizId,
+            @AuthenticationPrincipal User userDetails) {
+
+        log.info("Запрос на старт квиза {} от пользователя с ID: {}", quizId, userDetails.getId());
+
+        QuizStartResponseDto response = quizService.startQuiz(quizId, userDetails.getId());
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Получение списка всех квизов")
     @GetMapping
-    public ResponseEntity<List<QuizSummaryResponseDto>> getAllQuizzes() {
+    public ResponseEntity<List<QuizSummaryResponseDto>> getAllQuizzes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         log.info("Запрос на получение списка всех квизов");
-        return ResponseEntity.ok(quizService.getAllQuizzes());
+        return ResponseEntity.ok(quizService.getAllQuizzes(page, size));
     }
 
     @Operation(summary = "Получение детальной информации о квизе по ID")
