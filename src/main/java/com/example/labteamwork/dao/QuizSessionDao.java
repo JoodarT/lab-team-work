@@ -24,10 +24,9 @@ public class QuizSessionDao {
 
     public void saveOrUpdate(Long userId, Long quizId, LocalDateTime startedAt) {
         String sql = """
-            INSERT INTO quiz_sessions (user_id, quiz_id, started_at)
+            MERGE INTO quiz_sessions (user_id, quiz_id, started_at)
+            KEY(user_id, quiz_id)
             VALUES (?, ?, ?)
-            ON CONFLICT (user_id, quiz_id)
-            DO UPDATE SET started_at = EXCLUDED.started_at
             """;
         jdbcTemplate.update(sql, userId, quizId, startedAt);
     }
