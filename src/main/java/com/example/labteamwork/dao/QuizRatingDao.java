@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class QuizRatingDao {
             return ps;
         }, keyHolder);
 
-        rating.setId(keyHolder.getKey().longValue());
+        rating.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return rating;
     }
 

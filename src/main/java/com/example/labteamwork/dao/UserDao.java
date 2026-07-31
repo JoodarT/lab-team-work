@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -41,7 +42,7 @@ public class UserDao {
             return ps;
         }, keyHolder);
 
-        user.setId(((Number) keyHolder.getKeys().get("id")).longValue());
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return user;
     }
 

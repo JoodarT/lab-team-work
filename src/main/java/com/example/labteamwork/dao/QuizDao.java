@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -48,7 +49,7 @@ public class QuizDao {
             return ps;
         }, keyHolder);
 
-        quiz.setId(keyHolder.getKey().longValue());
+        quiz.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
         if (quiz.getQuestions() != null) {
             quiz.getQuestions().forEach(question -> {

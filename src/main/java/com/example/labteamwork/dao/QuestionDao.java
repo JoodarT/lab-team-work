@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class QuestionDao {
             return ps;
         }, keyHolder);
 
-        question.setId(keyHolder.getKey().longValue());
+        question.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
         if (question.getOptions() != null) {
             question.getOptions().forEach(option -> {
