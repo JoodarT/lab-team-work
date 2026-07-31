@@ -1,0 +1,157 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9-insert-initial-roles
+      author: Bolot Azatov
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "ROLE_USER" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "ROLE_ADMIN" }
+
+  - changeSet:
+      id: 10-insert-initial-users
+      author: Bolot Azatov
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: username, value: "johndoe" }
+              - column: { name: password, value: "$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd0P1RQLocA3a84e" }
+              - column: { name: email, value: "john@example.com" }
+              - column: { name: enabled, valueBoolean: true }
+        - insert:
+            tableName: user_roles
+            columns:
+              - column: { name: user_id, valueNumeric: 1 }
+              - column: { name: role_id, valueNumeric: 1 }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: username, value: "alice" }
+              - column: { name: password, value: "$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd0P1RQLocA3a84e" }
+              - column: { name: email, value: "alice@example.com" }
+              - column: { name: enabled, valueBoolean: true }
+        - insert:
+            tableName: user_roles
+            columns:
+              - column: { name: user_id, valueNumeric: 2 }
+              - column: { name: role_id, valueNumeric: 1 }
+
+  - changeSet:
+      id: 11-insert-initial-quizzes
+      author: Bolot Azatov
+      changes:
+        - insert:
+            tableName: quizzes
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: title, value: "Основы Java Core" }
+              - column: { name: description, value: "Проверьте свои знания синтаксиса и баз ООП в Java." }
+              - column: { name: category, value: "Программирование" }
+              - column: { name: time_limit_seconds, valueNumeric: 120 }
+              - column: { name: creator_id, valueNumeric: 1 }
+
+        - insert:
+            tableName: quizzes
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: title, value: "Spring Boot Basics" }
+              - column: { name: description, value: "Тест на знание аннотаций и работы Spring Framework." }
+              - column: { name: category, value: "Backend" }
+              - column: { name: time_limit_seconds, valueNumeric: 180 }
+              - column: { name: creator_id, valueNumeric: 2 }
+
+  - changeSet:
+      id: 12-insert-initial-questions
+      author: Bolot Azatov
+      changes:
+        - insert:
+            tableName: questions
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: quiz_id, valueNumeric: 1 }
+              - column: { name: question_text, value: "Какой класс является базовым для всех классов в Java?" }
+
+        - insert:
+            tableName: questions
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: quiz_id, valueNumeric: 1 }
+              - column: { name: question_text, value: "Какое ключевое слово используется для создания объекта?" }
+
+        - insert:
+            tableName: questions
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: quiz_id, valueNumeric: 2 }
+              - column: { name: question_text, value: "Какая аннотация указывает, что класс является Spring REST контроллером?" }
+
+  - changeSet:
+      id: 13-insert-initial-options
+      author: Bolot Azatov
+      changes:
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 1 }
+              - column: { name: option_text, value: "java.lang.Object" }
+              - column: { name: is_correct, valueBoolean: true }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 1 }
+              - column: { name: option_text, value: "java.lang.Class" }
+              - column: { name: is_correct, valueBoolean: false }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 1 }
+              - column: { name: option_text, value: "java.lang.System" }
+              - column: { name: is_correct, valueBoolean: false }
+
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 2 }
+              - column: { name: option_text, value: "create" }
+              - column: { name: is_correct, valueBoolean: false }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 2 }
+              - column: { name: option_text, value: "new" }
+              - column: { name: is_correct, valueBoolean: true }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 2 }
+              - column: { name: option_text, value: "make" }
+              - column: { name: is_correct, valueBoolean: false }
+
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 3 }
+              - column: { name: option_text, value: "@Service" }
+              - column: { name: is_correct, valueBoolean: false }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 3 }
+              - column: { name: option_text, value: "@RestController" }
+              - column: { name: is_correct, valueBoolean: true }
+        - insert:
+            tableName: options
+            columns:
+              - column: { name: question_id, valueNumeric: 3 }
+              - column: { name: option_text, value: "@Component" }
+              - column: { name: is_correct, valueBoolean: false }
