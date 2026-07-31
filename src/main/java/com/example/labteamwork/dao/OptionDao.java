@@ -31,7 +31,7 @@ public class OptionDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setLong(1, option.getQuestionId());
             ps.setString(2, option.getOptionText());
             ps.setBoolean(3, option.getIsCorrect());
