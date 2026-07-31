@@ -2,6 +2,7 @@ package com.example.labteamwork.dao;
 
 import com.example.labteamwork.entity.Quiz;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -59,7 +60,7 @@ public class QuizDao {
         return quiz;
     }
 
-    public List<Quiz> findAll() {
+    public List<Quiz> findAll(int limit, int offset) {
         String sql = "SELECT * FROM quizzes";
         return jdbcTemplate.query(sql, quizRowMapper);
     }
@@ -75,5 +76,10 @@ public class QuizDao {
         String sql = "SELECT COUNT(*) FROM quizzes WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
+    }
+
+    public String getQuizCreatorUsername(Long userId) {
+        String sql = "SELECT u.username FROM users u WHERE u.id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, userId);
     }
 }
